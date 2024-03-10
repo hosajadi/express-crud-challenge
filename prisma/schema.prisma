@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @unique @default(uuid())
+  name          String
+  email         String         @unique
+  password      String
+  refreshTokens RefreshToken[]
+  avatars       UserAvatar[]
+  bio           String?
+  latitude      String?
+  longitude     String?
+  liked         UserLike[]          @relation("UserLikes")
+  likedBy       UserLike[]          @relation("UserIsLiked")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model RefreshToken {
+  id          String   @id @unique @default(uuid())
+  hashedToken String
+  userId      String
+  User        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model UserAvatar {
+  id                     String         @id @default(cuid())
+  original               String
+  p180                   String?
+  p320                   String?
+  p640                   String?
+  p1280                  String?
+  userId                 String
+  user                   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UserLike {
+  id                              Int                       @id @default(autoincrement())
+  liker_id                        String
+  liker                           User                      @relation("UserLikes", fields: [liker_id], references: [id], onDelete: Cascade)
+  user_id                         String
+  user                            User                      @relation("UserIsLiked", fields: [user_id], references: [id], onDelete: Cascade)
+  @@unique([liker_id, user_id])
+}
