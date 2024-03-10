@@ -1,6 +1,6 @@
 import express from 'express';
-import auth from './auth/auth.routes'; // Adjust the path as needed
-import users from './users/users.routes'; // Adjust the path as needed
+import auth from './auth/auth.routes';
+import users from './users/users.routes';
 
 const router = express.Router();
 

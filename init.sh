@@ -1,5 +1,5 @@
 #!/bin/bash
 npx prisma generate
-npx prisma migrate deploy
+yarn migrate:deploy
 yarn seed
-yarn run start
+yarn start

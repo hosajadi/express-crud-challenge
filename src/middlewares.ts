@@ -1,5 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 
 function notFound(req: Request, res: Response, next: NextFunction): void {
   res.status(404);
@@ -41,5 +43,15 @@ function isAuthenticated(req: Request, res: Response, next: NextFunction): void 
 
   return next();
 }
+function validateDto(dtoClass: any) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const errors = await validate(plainToInstance(dtoClass, req.body));
+    if (errors.length > 0) {
+      const message = errors.map((error) => Object.values({error: error.constraints})).join(', ');
+      return res.status(400).json({ message });
+    }
+    next();
+  };
+}
 
-export { notFound, errorHandler, isAuthenticated };
+export { notFound, errorHandler, isAuthenticated, validateDto };

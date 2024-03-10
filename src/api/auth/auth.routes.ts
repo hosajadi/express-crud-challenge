@@ -17,6 +17,8 @@ import {
 import { hashToken } from '../../utils/hashToken';
 import {ILoginUser, IRegisterUser} from "./interfaces";
 import {errorsTypes} from "../../common/errors/errors";
+import {validateDto} from "../../middlewares";
+import {CreateUserDto} from "./dtos";
 
 const router = express.Router();
 
@@ -25,7 +27,7 @@ interface TokenPayload {
   jti: string;
 }
 
-router.post('/register', async (req: Request<{}, {}, IRegisterUser>, res: Response, next: NextFunction) => {
+router.post('/register', validateDto(CreateUserDto), async (req: Request<{}, {}, IRegisterUser>, res: Response, next: NextFunction) => {
   try {
     const { email, password, avatars, name } = req.body;
     if (!email || !password) {

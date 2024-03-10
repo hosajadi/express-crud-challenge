@@ -78,7 +78,6 @@ async function getAllUsers(): Promise<User[]> {
   }
   return finalResult;
 }
-
 async function likeUser(likerId: string, likedId: string): Promise<boolean> {
   const userLike = await db.userLike.findFirst({
     where: {
@@ -105,7 +104,6 @@ async function likeUser(likerId: string, likedId: string): Promise<boolean> {
   });
   return true;
 }
-
 async function unlikeUser(likerId: string, likedId: string): Promise<boolean> {
   const userLike = await db.userLike.findFirst({
     where: {
@@ -124,5 +122,23 @@ async function unlikeUser(likerId: string, likedId: string): Promise<boolean> {
   });
   return true;
 }
+async function findNearbyUsers(lat: number, lng: number, radius: number) {
+  const result = await db.$queryRaw` SELECT *,
+      (
+          6371 * acos (
+          cos ( radians(${lat}) ) 
+          * cos( radians( CAST(latitude AS DECIMAL(10,6)) ) )
+          * cos( radians( CAST(longitude AS DECIMAL(10,6)) ) - radians(${lng}) )
+          + sin ( radians(${lat}) )
+          * sin( radians( CAST(latitude AS DECIMAL(10,6)) ) )
+)
+) AS distance
+  FROM User
+  HAVING distance < ${radius}
+  ORDER BY distance
+  LIMIT 0 , 20;`;
 
-export { findUserByEmail, findUserById, createUserByEmailAndPassword, getAllUsers, updateUser, likeUser, unlikeUser };
+  return result;
+}
+
+export { findUserByEmail, findUserById, createUserByEmailAndPassword, getAllUsers, updateUser, likeUser, unlikeUser, findNearbyUsers };

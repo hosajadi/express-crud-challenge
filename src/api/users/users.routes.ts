@@ -1,8 +1,8 @@
 import express from 'express';
 import { isAuthenticated } from '../../middlewares'; // Adjust the path as needed
-import {findUserById, getAllUsers, likeUser, unlikeUser, updateUser} from './users.services'; // Adjust the path as needed
+import {findNearbyUsers, findUserById, getAllUsers, likeUser, unlikeUser, updateUser} from './users.services'; // Adjust the path as needed
 import { Request, Response, NextFunction } from 'express';
-import {IUpdateUser} from "../auth/interfaces";
+import {IFeed, IUpdateUser} from "../auth/interfaces";
 import {User} from "./models/user.model";
 import {userSockets} from "../socket";
 import {websocket} from "../../index";
@@ -20,6 +20,12 @@ interface AuthenticatedRequest2 extends Request {
     userId: string;
   };
 }
+interface AuthenticatedRequest3 extends Request {
+  body: IFeed;
+  payload?: {
+    userId: string;
+  };
+}
 
 const router = express.Router();
 
@@ -27,6 +33,14 @@ router.get('/', isAuthenticated, async (req: Request, res: Response, next: NextF
   try {
     const users: User[] = await getAllUsers();
     res.json(users);
+  } catch (err) {
+    next(err);
+  }
+});
+router.get('/feed', isAuthenticated, async (req: AuthenticatedRequest3, res: Response, next: NextFunction) => {
+  try {
+    const nearbyUsers = await findNearbyUsers(Number(req.body!.latitude), Number(req.body!.longitude), Number(req.body!.radius));
+    res.json(nearbyUsers);
   } catch (err) {
     next(err);
   }

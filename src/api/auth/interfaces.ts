@@ -16,3 +16,9 @@ export interface IUpdateUser{
     latitude?: string;
     longitude?: string;
 }
+
+export interface IFeed {
+    latitude: string;
+    longitude: string;
+    radius: string;
+}

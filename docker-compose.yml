@@ -11,22 +11,21 @@ services:
     env_file:
       - ./.env
     depends_on:
-      - mysql
+      - db
     restart: unless-stopped
 
-  # MySQL Database
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: mysql
+    container_name: mysqldb
     volumes:
       - db-data:/var/lib/mysql
     ports:
       - ${MYSQL_PORT}:3306
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
     env_file:
       - ./.env
     restart: always
